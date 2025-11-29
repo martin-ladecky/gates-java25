@@ -1,6 +1,5 @@
 package com.commerzbank.homework;
 
-import com.commerzbank.homework.components.BinaryCounter4Bit;
 import com.commerzbank.homework.components.BinaryCounter4BitTwo;
 
 public class Main {
@@ -14,7 +13,7 @@ public class Main {
         }
     }
 
-    public static void main(String[] args) {
+    static void main() {
         System.out.println("--- Starting Java 25 Binary Counter Simulation ---");
         
         var counter = new BinaryCounter4BitTwo();
