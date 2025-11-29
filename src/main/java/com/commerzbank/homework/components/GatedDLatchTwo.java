@@ -20,6 +20,8 @@ public class GatedDLatchTwo implements Signal {
         // Feedback loop setup
         this.gate3 = new NandGate(gate1, notQOutput);
         this.gate4 = new NandGate(gate2, qOutput);
+        qOutput.setSignal(false);
+        notQOutput.setSignal(true);
         evaluate();
     }
 

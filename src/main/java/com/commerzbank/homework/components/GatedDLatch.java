@@ -21,6 +21,12 @@ public class GatedDLatch implements Signal {
         // Feedback loop setup
         this.gate3 = new NandGate(gate1, notQOutput);
         this.gate4 = new NandGate(gate2, qOutput);
+
+        // Initialize the latch to a known, stable state (Q=false, !Q=true).
+        // The default state of Wires (both false) is an invalid state for a latch
+        // and causes unpredictable behavior on startup.
+        qOutput.setSignal(false);
+        notQOutput.setSignal(true);
     }
 
     /**

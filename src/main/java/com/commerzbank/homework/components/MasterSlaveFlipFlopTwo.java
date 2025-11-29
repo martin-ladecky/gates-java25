@@ -1,18 +1,18 @@
 package com.commerzbank.homework.components;
 
 import com.commerzbank.homework.core.Signal;
+import com.commerzbank.homework.core.Wire;
 import com.commerzbank.homework.gates.NandGate;
 
 /**
  * Implements a rising-edge triggered Master-Slave D-Type Flip-Flop.
  *
  * <p>A flip-flop is a fundamental memory circuit that stores a single bit of data.
- * This specific implementation is "edge-triggered," meaning it only changes its output
- * state at a specific moment in the clock cycle.
+ * This implementation is "edge-triggered," capturing the value of the data input
+ * at the precise moment the clock transitions from low (false) to high (true).
  *
- * <p>This Master-Slave D-Flip-Flop captures the value of the {@code data} input at the
- * precise moment the {@code clock} signal transitions from low (false) to high (true).
- * The captured value is then held at the output until the next rising clock edge.
+ * <p>This component is self-contained. Use the {@link #setData(boolean)} and
+ * {@link #setClock(boolean)} methods to control its operation.
  *
  * <p>It works by chaining two {@link GatedDLatch} components:
  * <ol>
@@ -22,25 +22,46 @@ import com.commerzbank.homework.gates.NandGate;
  *     transitions from low to high, the master latch closes, holding the last-seen data value,
  *     and the slave latch opens, allowing this captured value to pass through to the final output.</li>
  * </ol>
- * This architecture prevents the "transparency" issue where the output could change
- * multiple times while the clock is high.
  */
 public class MasterSlaveFlipFlopTwo implements Signal {
+    private final Wire dataWire = new Wire();
+    private final Wire clockWire = new Wire();
+    private final GatedDLatch master;
     private final GatedDLatch slave;
 
     /**
      * Constructs a rising-edge Master-Slave D-Flip-Flop.
-     *
-     * @param clock The clock signal. The flip-flop will change state on the rising edge of this signal.
-     * @param data  The data input signal. Its value will be captured on the rising clock edge.
      */
-    public MasterSlaveFlipFlopTwo(Signal clock, Signal data) {
-        var invertedClock = new NandGate(clock, clock);
+    public MasterSlaveFlipFlopTwo() {
+        var invertedClock = new NandGate(clockWire, clockWire);
 
-        // The master latch is open when the clock is low (since invertedClock will be high).
-        var master = new GatedDLatch(invertedClock, data);
-        // The slave latch is open when the clock is high, capturing the state from the master.
-        this.slave = new GatedDLatch(clock, master);
+        // With the GatedDLatch now being stable, no workarounds are needed here.
+        this.master = new GatedDLatch(invertedClock, dataWire);
+        this.slave = new GatedDLatch(clockWire, master);
+    }
+
+    /**
+     * Sets the data input signal for the next clock cycle.
+     * @param state the boolean value for the data line.
+     */
+    public void setData(boolean state) {
+        dataWire.setSignal(state);
+    }
+
+    /**
+     * Controls the clock signal and triggers the flip-flop's state changes.
+     * The flip-flop's output state is captured on the rising edge (false -> true).
+     *
+     * @param state the new boolean state of the clock.
+     */
+    public void setClock(boolean state) {
+        clockWire.setSignal(state);
+        // When the clock is LOW, the master latch is open and should be sampling the data.
+        // We must explicitly run its stabilization to simulate this. This ensures that
+        // when the clock goes high, the master has captured the correct value.
+        if (!state) {
+            master.stabilize();
+        }
     }
 
     /**
@@ -51,6 +72,8 @@ public class MasterSlaveFlipFlopTwo implements Signal {
      */
     @Override
     public boolean getState() {
+        // The slave's getState will trigger its own stabilization, which in turn pulls
+        // the stable state from the master latch.
         return slave.getState();
     }
 
