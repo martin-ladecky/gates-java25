@@ -1,6 +1,7 @@
 package com.commerzbank.homework;
 
 import com.commerzbank.homework.components.BinaryCounter4Bit;
+import com.commerzbank.homework.components.BinaryCounter4BitTwo;
 
 public class Main {
     
@@ -16,15 +17,15 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("--- Starting Java 25 Binary Counter Simulation ---");
         
-        var counter = new BinaryCounter4Bit();
+        var counter = new BinaryCounter4BitTwo();
 
         System.out.println(new CounterState(0, counter.getValue()));
 
         for (int i = 1; i <= 15; i++) {
             // Simulate Clock Pulse
+            counter.setClock(false); // Falling edge
             counter.setClock(true);  // Rising edge
-            counter.setClock(false); // Falling edge (Flip-Flops trigger here)
-            
+
             System.out.println(new CounterState(i, counter.getValue()));
         }
     }
