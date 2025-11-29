@@ -1,7 +1,6 @@
 package com.commerzbank.homework.components;
 
 import com.commerzbank.homework.core.Wire;
-import java.util.List;
 
 public class BinaryCounter4Bit {
     private final Wire clockInput = new Wire();

@@ -10,7 +10,7 @@ public class BinaryCounter1Bit implements Signal {
         this.flipFlop = new MasterSlaveFlipFlop(clock, feedbackLoop);
     }
 
-    public void update() {
+    private void update() {
         feedbackLoop.setSignal(flipFlop.getNotQState());
     }
 

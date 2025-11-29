@@ -25,7 +25,7 @@ public class GatedDLatchTwo implements Signal {
         evaluate();
     }
 
-    /*
+    /**
      * Resolves the feedback loop for this latch.
      */
     public void evaluate() {
